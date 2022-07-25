@@ -9,6 +9,7 @@ export const theme = {
     success: '#48c88f',
     background: '#f0eff4',
     title: '#707070',
+    teste: 'red',
 
     // Primary
     primary_050: '#b7c9ff',
