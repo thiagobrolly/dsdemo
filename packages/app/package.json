@@ -1,10 +1,10 @@
 {
   "name": "@dsdemo/app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
-    "@dsdemo/components": "^0.1.1",
-    "@dsdemo/styles": "^0.2.0",
+    "@dsdemo/components": "^0.1.2",
+    "@dsdemo/styles": "^0.3.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",

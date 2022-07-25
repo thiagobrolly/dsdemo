@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/thiagobrolly/dsdemo/compare/@dsdemo/styles@0.2.0...@dsdemo/styles@0.3.0) (2022-07-25)
+
+
+### Features
+
+* **styles:** nova cor ([e57a9b2](https://github.com/thiagobrolly/dsdemo/commit/e57a9b28cebe001f73b7f8d00b267da6ed632ed7))
+
+
+
+
+
 # [0.2.0](https://github.com/thiagobrolly/dsdemo/compare/@dsdemo/styles@0.1.0...@dsdemo/styles@0.2.0) (2022-07-25)
 
 
