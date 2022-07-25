@@ -1,0 +1,327 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '.';
+
+<Meta
+  title="Components/Accordion"
+  component={Accordion}
+  args={{
+    width: 'auto',
+    type: 'single',
+    disabled: false,
+    collapsible: true,
+  }}
+  argTypes={{
+    children: {
+      table: {
+        disable: true,
+      },
+    },
+    className: {
+      table: {
+        disable: true,
+      },
+    },
+    defaultValue: {
+      control: false,
+      table: {
+        type: {
+          summary: 'string',
+        },
+      },
+    },
+    type: {
+      options: ['single', 'multiple'],
+      control: { type: 'radio' },
+      table: {
+        type: {
+          summary: '"single" | "multiple"',
+        },
+        defaultValue: { summary: 'single' },
+      },
+    },
+    disabled: {
+      table: {
+        type: {
+          summary: 'boolean',
+        },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    collapsible: {
+      table: {
+        type: {
+          summary: 'boolean',
+          detail:
+            'Permite fechar o conteúdo ao clicar no item aberto quando o tipo é "single"',
+        },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    asChild: {
+      table: {
+        disable: true,
+      },
+    },
+  }}
+  parameters={{
+    backgrounds: {
+      default: 'paylivre',
+    },
+  }}
+/>
+
+export const Template = ({ ...args }) => (
+  <Accordion {...args}>
+    <AccordionItem value="item-1">
+      <AccordionTrigger>Item - 1</AccordionTrigger>
+      <AccordionContent>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis, nisi
+        repudiandae. Facilis a sapiente esse vitae magni repellat maxime porro
+        quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+        doloribus.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="item-2">
+      <AccordionTrigger>Item - 2</AccordionTrigger>
+      <AccordionContent>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis, nisi
+        repudiandae. Facilis a sapiente esse vitae magni repellat maxime porro
+        quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+        doloribus.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="item-3">
+      <AccordionTrigger>Item - 3</AccordionTrigger>
+      <AccordionContent>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis, nisi
+        repudiandae. Facilis a sapiente esse vitae magni repellat maxime porro
+        quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+        doloribus.
+      </AccordionContent>
+    </AccordionItem>
+  </Accordion>
+);
+
+# Accordion
+
+O componente `Accordion` permite que o usuário exiba e oculte uma seção de conteúdo associada.
+
+## Import
+
+Importe todas as partes.
+
+```sh
+  import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@dsdemo/components';
+```
+
+## Basic
+
+<Canvas>
+  <Story name="Template">{Template.bind({})}</Story>
+</Canvas>
+
+## Accordion Multiple
+
+O `Accordion` pode receber a prop `multiple` para que mais de um item permanessa aberto.
+
+<Canvas>
+  <Story name="Multiple">
+    <Accordion type="multiple">
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Item - 1</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Item - 2</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Item - 3</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Story>
+</Canvas>
+
+## Expanded item
+
+O `Accordion` pode receber a prop `defaultValue` para definir um item aberto por padrão.
+
+<Canvas>
+  <Story name="Expanded item">
+    <Accordion type="single" defaultValue="item-1">
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Item - 1</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Item - 2</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Item - 3</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Story>
+</Canvas>
+
+## Multiple items expanded
+
+O `Accordion` pode receber a prop `defaultValue` para definir vários itens abertos por padrão.
+
+<Canvas>
+  <Story name="Expanded multiple item">
+    <Accordion type="multiple" defaultValue={['item-1', 'item-2', 'item-3']}>
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Item - 1</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Item - 2</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Item - 3</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Story>
+</Canvas>
+
+## Accordion Disabled
+
+O `Accordion` pode receber a prop `disabled` para impedir interações com todos os itens do accordion.
+
+<Canvas>
+  <Story name="Disabled All">
+    <Accordion disabled>
+      <AccordionItem disabled value="item-1">
+        <AccordionTrigger>Item - 1</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Item - 2</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Item - 3</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Story>
+</Canvas>
+
+## AccordionItem Disabled
+
+O `AccordionItem` pode receber a prop `disabled` para impedir interações com apenas um item.
+
+<Canvas>
+  <Story name="Disabled Item">
+    <Accordion>
+      <AccordionItem value="item-1" disabled>
+        <AccordionTrigger>Item - 1</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Item - 2</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Item - 3</AccordionTrigger>
+        <AccordionContent>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis,
+          nisi repudiandae. Facilis a sapiente esse vitae magni repellat maxime
+          porro quibusdam ullam magnam nostrum modi, tempore amet, quaerat iste
+          doloribus.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Story>
+</Canvas>
+
+## Props
+
+### Accordion
+
+<ArgsTable story="Template" />
+
+### AccordionItem
+
+<ArgsTable of={AccordionItem} />

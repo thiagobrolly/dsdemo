@@ -1,0 +1,339 @@
+stages:
+  - setup
+  - app_build
+  - storybook_build
+  - test
+  - docker_build
+  - deploy
+  - pages
+  - app_build_play
+  - test_play
+  - docker_build_play
+  - deploy_play
+  - app_build_prod
+  - test_prod
+  - docker_build_prod
+  - deploy_prod
+
+variables:  
+  APP_VERSION: ${CI_COMMIT_REF_SLUG}_${CI_PIPELINE_ID}
+  PAGES_URL: ''
+  PAGES_MAIN_URL: ''
+
+before_script:  
+  - apt update
+  - apt install curl make g++ gcc -y
+  - curl -sL https://deb.nodesource.com/setup_14.x | bash -
+  - apt install nodejs -y
+  - curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+  - echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | tee /etc/apt/sources.list.d/yarn.list
+  - apt update && apt install yarn
+  - export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+  - npm install
+    
+#setup for storybook    
+setup:
+  stage: setup
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - node_modules/
+  script:
+    - yarn
+
+build_development:
+    tags:
+      - development
+    stage: app_build
+    script:
+        - echo ' ........ DEVELOPMENT BUILD'
+        - cp ./k8s/robots.txt ./public/
+        - yarn config set network-timeout 300000
+        - yarn
+        - yarn build:dev
+
+    except: 
+      - /^v.*$/
+      - /^play_v.*$/
+    artifacts:
+      paths:
+        - build/*
+    environment:
+      name: Frontend-Development
+
+#build do storybook
+storybook-build:
+  stage: storybook_build
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - storybook-static/
+  script:
+    - yarn
+    - yarn global add lerna
+    - lerna run build --stream
+    - yarn storybook
+    - yarn build-storybook
+
+test_development:
+    tags:
+      - development
+    stage: test
+    script:
+      - yarn config set network-timeout 300000
+      - yarn config set cache-folder .yarn
+      - yarn install --frozen-lockfile
+      - yarn test --silent -u --coverage
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    except: 
+    - /^v.*$/
+    - /^play_v.*$/
+    environment:
+      name: Frontend-Development
+
+docker_build_development:
+  tags:
+    - development
+  stage: docker_build
+  image: docker:18.09.7-dind
+  services:
+    - docker:18.09.7-dind
+  variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375/
+  before_script:
+    - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://gcr.io
+  script:
+    - cp ./k8s/Dockerfile Dockerfile
+    - docker build -t gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:${APP_VERSION}-dev .
+    - docker push gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:${APP_VERSION}-dev
+  except: 
+    - /^v.*$/
+    - /^play_v.*$/
+  environment:
+    name: Frontend-Development
+
+deploy_development:
+  tags:
+    - development
+  stage: deploy
+  image: dtzar/helm-kubectl:3.6.2
+  before_script:
+    - echo "Deploy Development"
+  script:
+    - sed -i "s/{APP_VERSION}/${APP_VERSION}-dev/g" ./k8s/helm/frontend/Chart.yaml
+    - helm upgrade frontend ./k8s/helm/frontend/ --install --wait --debug -f ./k8s/helm/frontend/values-development.yaml -n ${GCP_CLUSTER_NAMESPACE}
+  environment:
+    kubernetes: 
+      namespace: $GCP_CLUSTER_NAMESPACE
+    name: Frontend-Development
+    url: http://dev.paylivre.com/
+  only: 
+    - /^develop.*$/
+  resource_group: deploy_frontend
+ 
+#Deploy e exclusão do storybook 
+deploy-storybook:
+  stage: deploy
+  script:
+    - echo "This job configures an environment."
+  environment:
+    name: storybook/$CI_COMMIT_REF_SLUG
+    url: $PAGES_URL
+    on_stop: remove-storybook
+  only:
+    - branches
+
+    
+remove-storybook:
+  stage: deploy
+  cache:
+    key: 'sp-storybook'
+    paths:
+      - public
+  script:
+    - rm -rf "public/$CI_COMMIT_REF_SLUG/storybook"
+  when: manual
+  variables:
+    GIT_STRATEGY: none # needed to prevent "Couldn't find remote ref" error
+  environment:
+    name: storybook/$CI_COMMIT_REF_SLUG
+    action: stop
+
+#Gitlab Pages
+
+pages:
+  stage: pages
+  cache:
+    key: 'sp-storybook'
+    paths:
+      - public
+  script:
+    - if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
+      mkdir -p public;
+      touch public/index.html;
+      echo "<!DOCTYPE HTML><script>window.location.href = '$PAGES_MAIN_URL'</script>" > public/index.html;
+      fi;
+    - rm -rf "public/$CI_COMMIT_REF_SLUG"
+    - mkdir -p "public/$CI_COMMIT_REF_SLUG";
+    - mv storybook-static "public/$CI_COMMIT_REF_SLUG"
+  artifacts:
+    paths:
+      - public    
+
+######################################
+
+build_playground:
+    tags:
+      - playground
+    stage: app_build_play
+    script:
+        - echo ' ........ PLAYGROUND BUILD'
+        - cp ./k8s/robots.txt ./public/
+        - yarn config set network-timeout 300000
+        - yarn
+        - yarn build:play
+    only: 
+    - /^play_v.*$/
+    artifacts:
+      paths:
+        - build/*
+    environment:
+      name: Frontend-Playground
+    resource_group: build_frontend        
+    
+test_playground:
+    tags:
+      - playground
+    stage: test_play
+    script:
+      - yarn config set network-timeout 300000
+      - yarn config set cache-folder .yarn
+      - yarn install --frozen-lockfile
+      - yarn test --silent -u --coverage
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    only: 
+    - /^play_v.*$/
+    environment:
+      name: Frontend-Playground
+
+docker_build_playground:
+  tags:
+    - playground
+  stage: docker_build_play
+  image: docker:18.09.7-dind
+  services:
+    - docker:18.09.7-dind
+  variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375/
+  before_script:
+    - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://gcr.io
+  script:
+    - cp ./k8s/Dockerfile Dockerfile
+    - docker build -t gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:${APP_VERSION}-play .
+    - docker push gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:${APP_VERSION}-play
+  only: 
+    - /^play_v.*$/
+  environment:
+    name: Frontend-Playground
+
+deploy_playground:
+  tags:
+    - playground
+  stage: deploy_play
+  image: dtzar/helm-kubectl:3.6.2
+  before_script:
+    - echo "Deploy Playground"
+  script:
+    - sed -i "s/{APP_VERSION}/${APP_VERSION}-play/g" ./k8s/helm/frontend/Chart.yaml
+    - helm upgrade frontend ./k8s/helm/frontend/ --install --wait --debug -f ./k8s/helm/frontend/values-playground.yaml -n ${GCP_CLUSTER_NAMESPACE}
+  environment:
+    kubernetes: 
+      namespace: $GCP_CLUSTER_NAMESPACE
+    name: Frontend-Playground
+    url: http://playground.paylivre.com/
+  when: manual  
+  only: 
+    - /^play_v.*$/
+  resource_group: deploy_frontend
+
+######################################
+
+build_production:
+    tags:
+      - playground
+    stage: app_build_prod
+    script:
+        - echo ' ........ PRODUCTION BUILD'
+        - yarn config set network-timeout 300000
+        - yarn
+        - yarn build:prod
+    only: 
+      - /^v.*$/
+    artifacts:
+      paths:
+        - build/*
+    environment:
+      name: Frontend-Production
+
+test_production:
+    tags:
+      - production
+    stage: test_prod
+    script:
+      - yarn config set network-timeout 300000
+      - yarn config set cache-folder .yarn
+      - yarn install --frozen-lockfile
+      - yarn test --silent -u --coverage
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    only: 
+      - /^v.*$/
+    environment:
+      name: Frontend-Production
+
+docker_build_production:
+  tags:
+    - production
+  stage: docker_build_prod
+  image: docker:18.09.7-dind
+  services:
+    - docker:18.09.7-dind
+  variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375/
+  before_script:
+    - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://gcr.io
+  script:
+    - cp ./k8s/Dockerfile Dockerfile
+    - docker build -t gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:$APP_VERSION -t gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:latest .
+    - docker push gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:$APP_VERSION
+    - docker push gcr.io/$GCP_PROJECT_ID/$GCP_REGISTRY_REPO:latest
+  only: 
+    - /^v.*$/
+  environment:
+    name: Frontend-Production
+
+deploy_production:
+  tags:
+    - production
+  stage: deploy_prod
+  image: dtzar/helm-kubectl:3.6.2
+  before_script:
+    - echo "Deploy Production"
+  script:
+    - sed -i "s/{APP_VERSION}/${APP_VERSION}/g" ./k8s/helm/frontend/Chart.yaml
+    - helm upgrade frontend ./k8s/helm/frontend/ --install --wait --debug -f ./k8s/helm/frontend/values-production.yaml -n ${GCP_CLUSTER_NAMESPACE}
+  environment:
+    kubernetes: 
+      namespace: $GCP_CLUSTER_NAMESPACE
+    name: Frontend-Production
+    url: http://paylivre.com/
+  when: manual
+  only: 
+    - /^v.*$/
+  resource_group: deploy_frontend
