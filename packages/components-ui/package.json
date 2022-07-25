@@ -1,6 +1,6 @@
 {
   "name": "@dsdemo/components",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
@@ -18,8 +18,8 @@
     "styled-components": "^5.0.0"
   },
   "dependencies": {
-    "@dsdemo/icons": "^0.0.0",
-    "@dsdemo/styles": "^0.0.0",
+    "@dsdemo/icons": "^0.1.0",
+    "@dsdemo/styles": "^0.1.0",
     "@radix-ui/react-accordion": "^0.1.6",
     "@radix-ui/react-popover": "^0.1.6",
     "@radix-ui/react-tooltip": "^0.1.7",
