@@ -1,6 +1,6 @@
 {
   "name": "@dsdemo/eslint-config",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "description": "ESLint configuration used by Paylivre.",
   "license": "MIT",
