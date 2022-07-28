@@ -30,11 +30,6 @@ module.exports = {
         tabWidth: 2,
       },
     ],
-    'react/react-in-jsx-scope': 'off',
-    'react/prop-types': 'off',
-
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
     'react/jsx-filename-extension': [
       1,
       { extensions: ['.ts', '.tsx', '.js', '.jsx', '.mdx'] },
@@ -47,14 +42,6 @@ module.exports = {
         tsx: 'never',
       },
     ],
-    'no-use-before-define': 'off',
-    'no-useless-escape': 'off',
-    '@typescript-eslint/no-use-before-define': ['off'],
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'react/no-children-prop': 'off',
-    'import/prefer-default-export': 'off',
-    'import/no-extraneous-dependencies': 'off',
-    'react/jsx-props-no-spreading': 'off',
     'react/function-component-definition': [
       'warn',
       {
@@ -66,11 +53,13 @@ module.exports = {
         unnamedComponents: ['function-expression', 'arrow-function'],
       },
     ],
-    'react/jsx-no-useless-fragment': 'off',
-    'react/destructuring-assignment': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react/react-in-jsx-scope': 'off',
+    'no-useless-escape': 'off',
+    'import/prefer-default-export': 'off',
+    'import/no-extraneous-dependencies': 'off',
+    'react/jsx-props-no-spreading': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
-    'jsx-a11y/label-has-associated-control': 'off',
     'no-unused-expressions': 'off',
     'no-nested-ternary': 'off',
     'react/require-default-props': 'off',
@@ -82,8 +71,20 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.mdx', '*.md'],
+      files: ['*.mdx'],
       extends: ['plugin:mdx/recommended', 'plugin:mdx/overrides'],
+      rules: {
+        "prettier/prettier": [
+          "error",
+          {
+            "semi": true,
+            "singleQuote": true,
+            "trailingComma": "all",
+            "printWidth": 80,
+            "tabWidth": 2
+          }
+        ]
+      }
     },
   ],
 };
